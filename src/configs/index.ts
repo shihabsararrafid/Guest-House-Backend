@@ -37,7 +37,7 @@ class Config {
       throw new Error(`Config file not found: ${configFile}`);
     }
     let config: ConfigData = JSON.parse(fs.readFileSync(configFile, "utf-8"));
-
+    console.log(config, "config");
     // 3. Load and merge shared config
     const sharedConfigFile = path.join(__dirname, "config.shared.json");
     if (fs.existsSync(sharedConfigFile)) {

@@ -12,6 +12,39 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model User{
-  id        String  @unique @id @default(cuid())
+model User {
+  id        String  @id @default(cuid())
+  role      Role    @default(value:USER)
+  department String @default("")
+  roll       String?
+  firstName          String?
+  lastName           String?
+  currentPosition    String?
+  currentRole        String?
+  address            String?
+  thana              String?
+  district           String?
+  email              String  @unique
+  username           String?  @unique
+  password           String
+  salt               String 
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  lastLoggedIn     DateTime?
+  isEmailVerified    Boolean   @default(false)
+  isActive           Boolean   @default(true)
+  retryCount         Int       @default(0) 
+
+
+  @@index([email,username,id])
+  
+}
+
+
+
+enum Role {
+  USER
+  ADMIN
+  RECEPTIONIST
+  SUPERADMIN
 }

@@ -14,6 +14,11 @@ import prisma from "./libraries/db/prisma";
 import { errorHandler } from "./libraries/error-handling";
 import { logger } from "./libraries/log/logger";
 import requestIdMiddleware from "./middlewares/request-context";
+import {
+  errorHandlerMiddleware,
+  notFoundHandler,
+  unhandledErrorHandler,
+} from "./libraries/error-handling/ErrorHandler";
 
 let connection: Server;
 
@@ -23,6 +28,13 @@ const createExpressApp = (): Express => {
   expressApp.use(helmet());
   expressApp.use(urlencoded({ extended: true }));
   expressApp.use(json());
+  expressApp.use(notFoundHandler);
+
+  // Add the error handler
+  expressApp.use(errorHandlerMiddleware);
+
+  // Catch any unhandled errors
+  expressApp.use(unhandledErrorHandler);
 
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`${req.method} ${req.originalUrl}`);
