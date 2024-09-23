@@ -1,11 +1,10 @@
 import { logger } from "./libraries/log/logger";
-
+import domainRoutes from "./domains/routes/index";
 import express, { Express } from "express";
-import domainRoutes from "./domains";
+
 export function defineRoutes(expressApp: Express) {
   logger.info("Defining routes...");
   const router = express.Router();
-
   domainRoutes(router);
 
   expressApp.use("/api/v1", router);

@@ -15,7 +15,7 @@ export default class AuthRepository extends BaseRepository<User> {
     throw new Error("Method not implemented.");
   }
   async create(data: {
-    role: $Enums.Role;
+    role?: $Enums.Role;
     email: string;
     username: string | null;
     password: string;
