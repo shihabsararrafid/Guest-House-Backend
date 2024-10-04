@@ -12,7 +12,7 @@ const authController = new AuthController(authRepository);
 router.post(
   "/register",
   validateRequest({ schema: registerSchema }),
-  authController.registerUser
+  (req, res, next) => authController.registerUser(req, res, next)
 );
 
 export default router;

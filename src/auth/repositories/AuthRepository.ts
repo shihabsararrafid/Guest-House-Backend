@@ -38,8 +38,17 @@ export default class AuthRepository extends BaseRepository<User> {
         data: { ...data, salt },
       });
     } catch (error) {
-      await errorHandler.handleError(error);
-      throw new AppError("database-error", "Failed to fetch all users");
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to create new user: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
     }
   }
   update(id: string, data: Partial<User>): Promise<Partial<User>> {

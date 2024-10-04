@@ -1,3 +1,4 @@
+// AppError.ts
 export class AppError extends Error {
   HTTPStatus: number;
   isTrusted: boolean;
