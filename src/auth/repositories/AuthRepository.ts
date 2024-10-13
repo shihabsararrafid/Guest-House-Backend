@@ -1,8 +1,12 @@
 import { $Enums, PrismaClient, User } from "@prisma/client";
-import { BaseRepository } from "../../domains/repositories/BaseRepositories";
 import bcrypt from "bcrypt";
-import { errorHandler } from "../../libraries/error-handling";
+import { BaseRepository } from "../../domains/repositories/BaseRepositories";
 import { AppError } from "../../libraries/error-handling/AppError";
+
+import { loginSchema } from "../../domains/interfaces/auth.interface";
+import { z } from "zod";
+
+type ILogin = z.infer<typeof loginSchema>;
 
 export default class AuthRepository extends BaseRepository<User> {
   constructor(prisma: PrismaClient) {
@@ -35,8 +39,36 @@ export default class AuthRepository extends BaseRepository<User> {
           409
         );
       return this.prisma.user.create({
-        data: { ...data, salt },
+        data: { ...data, salt, password: hashed },
       });
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to create new user: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
+  }
+  async login(data: ILogin) {
+    try {
+      const lookupField = data.email
+        ? { email: data.email }
+        : { username: data.username };
+
+      const user = await this.prisma.user.findUnique({
+        where: lookupField,
+      });
+      if (!user) {
+        throw new AppError("auth-error", "User not found", 404);
+      }
+      const isChecked = await bcrypt.compare(data.password, user.password);
+      console.log(isChecked);
     } catch (error) {
       if (error instanceof AppError) {
         throw error;

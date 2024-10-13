@@ -1,12 +1,11 @@
-import Joi from "joi";
-
-const schema = Joi.object({
-  NODE_ENV: Joi.string()
-    .valid("development", "production", "test")
+import { z } from "zod";
+const schema = z.object({
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
     .default("development"),
-  DATABASE_URL: Joi.string().required(),
-  RATE: Joi.number().min(0).required(),
-  PORT: Joi.number().min(1000).default(4000),
+  DATABASE_URL: z.string(),
+  RATE: z.coerce.number().min(0),
+  PORT: z.coerce.number().min(1000).default(4000),
 });
 
 export default schema;
