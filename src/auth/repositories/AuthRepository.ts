@@ -55,7 +55,7 @@ export default class AuthRepository extends BaseRepository<User> {
       }
     }
   }
-  async login(data: ILogin) {
+  async login(data: ILogin): Promise<Partial<User>> {
     try {
       const lookupField = data.email
         ? { email: data.email }
@@ -67,8 +67,28 @@ export default class AuthRepository extends BaseRepository<User> {
       if (!user) {
         throw new AppError("auth-error", "User not found", 404);
       }
+      if (!user.isActive) {
+        throw new AppError(
+          "auth-error",
+          "You are an inactive user . Contact with administration",
+          403
+        );
+      }
+      if (!user.isEmailVerified) {
+        throw new AppError(
+          "auth-error",
+          "Email not verified. Please check your email for verification instructions.",
+          401
+        );
+      }
       const isChecked = await bcrypt.compare(data.password, user.password);
-      console.log(isChecked);
+      if (!isChecked) {
+        throw new AppError("auth-error", "You are unauthorized", 401);
+      }
+      // delete user.password
+      const { password, ...response } = user;
+      return response;
+      // console.log(isChecked);
     } catch (error) {
       if (error instanceof AppError) {
         throw error;

@@ -25,10 +25,15 @@ export default class AuthController extends BaseController {
       }
     }
   }
-  async loginUser(req: Request, res: Response, next: NextFunction) {
+  async loginUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       // const r = loginSchema.validateAsync(req.body);
-      await this.authRepository.login(req.body);
+      const user = await this.authRepository.login(req.body);
+      this.sendSuccessResponse(res, user);
     } catch (error) {
       if (error instanceof AppError) {
         this.sendErrorResponse(res, error);
