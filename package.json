@@ -16,7 +16,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/start.ts",
     "build": "tsc",
     "prepare": "husky install",
-    "genKey": "ts-node src/utils/genKeyPair.ts",
+    "genKey": "ts-node scripts/dev/genKeyPair.ts",
     "generate": "prisma generate",
     "format": "prisma format",
     "migrate-dev": "prisma migrate dev",
