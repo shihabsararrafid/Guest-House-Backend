@@ -1,8 +1,11 @@
+import { WelcomeEmail } from "./../../react-mail-templates/welcome";
 import { NextFunction, Request, Response } from "express";
 import { BaseController } from "../../domains/controllers/base.controller";
 import { AppError } from "../../libraries/error-handling/AppError";
 import AuthRepository from "../repositories/AuthRepository";
 import EmailService from "../../domains/services/email.service";
+import { render } from "@react-email/components";
+import React from "react";
 
 export default class AuthController extends BaseController {
   private authRepository: AuthRepository;
@@ -19,7 +22,19 @@ export default class AuthController extends BaseController {
   ): Promise<void> {
     try {
       const user = await this.authRepository.create(req.body);
-      this.emailService.sendEmail("", "Testing", ",<h1>Hello Rafid</h1>");
+      // const c = <WelcomeEmail/>
+      // Render the welcome email with the verification URL
+      const emailHtml = await render(
+        React.createElement(WelcomeEmail, {
+          verificationUrl: "verificationUrl",
+        })
+      );
+      // const html = await render(<WelcomeEmail />);
+      this.emailService.sendEmail(
+        user.email ?? "",
+        "Verify your Email",
+        emailHtml
+      );
       this.sendSuccessResponse(res, user);
     } catch (error) {
       if (error instanceof AppError) {
