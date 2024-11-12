@@ -6,7 +6,7 @@ const start = async () => {
 
 start()
   .then(() => {
-    console.log("Done");
+    console.log("Server is running");
   })
   .catch((error) => {
     console.error(error);

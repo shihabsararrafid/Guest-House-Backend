@@ -67,13 +67,13 @@ class Config {
     try {
       // 5. Validate the config
       const validatedConfig = schema.parse(finalConfig);
+      console.log(finalConfig);
       return validatedConfig;
 
       // If we reach this point, validation was successful
       // You can now use validatedConfig, which is type-safe
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // console.log(finalConfig);
         const missingProperties = error.issues.map((issue) =>
           issue.path.join(".")
         );
