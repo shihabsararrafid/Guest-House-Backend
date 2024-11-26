@@ -6,14 +6,21 @@ import AuthRepository from "../repositories/AuthRepository";
 import EmailService from "../../domains/services/email.service";
 import { render } from "@react-email/components";
 import React from "react";
+import { JwtService } from "../../domains/services/auth/jwt.service";
 
 export default class AuthController extends BaseController {
   private authRepository: AuthRepository;
   private emailService: EmailService;
-  constructor(authRepository: AuthRepository, emailService: EmailService) {
+  private jwtService: JwtService;
+  constructor(
+    authRepository: AuthRepository,
+    emailService: EmailService,
+    jwtService: JwtService
+  ) {
     super();
     this.authRepository = authRepository;
     this.emailService = emailService;
+    this.jwtService = jwtService;
   }
   async registerUser(
     req: Request,
@@ -52,6 +59,14 @@ export default class AuthController extends BaseController {
     try {
       // const r = loginSchema.validateAsync(req.body);
       const user = await this.authRepository.login(req.body);
+      const token = await this.jwtService.generateTokenPair({
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive,
+        isEmailVerified: user.isEmailVerified,
+      });
+      console.log(token);
       this.sendSuccessResponse(res, user);
     } catch (error) {
       if (error instanceof AppError) {
