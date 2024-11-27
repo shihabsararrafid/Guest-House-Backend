@@ -74,13 +74,13 @@ export default class AuthRepository extends BaseRepository<User> {
           403
         );
       }
-      if (!user.isEmailVerified) {
-        throw new AppError(
-          "auth-error",
-          "Email not verified. Please check your email for verification instructions.",
-          401
-        );
-      }
+      // if (!user.isEmailVerified) {
+      //   throw new AppError(
+      //     "auth-error",
+      //     "Email not verified. Please check your email for verification instructions.",
+      //     401
+      //   );
+      // }
       const isChecked = await bcrypt.compare(data.password, user.password);
       if (!isChecked) {
         throw new AppError("auth-error", "You are unauthorized", 401);

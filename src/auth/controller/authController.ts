@@ -66,6 +66,11 @@ export default class AuthController extends BaseController {
         isActive: user.isActive,
         isEmailVerified: user.isEmailVerified,
       });
+      this.jwtService.setAuthCookies(
+        res,
+        token.accessToken,
+        token.refreshToken
+      );
       console.log(token);
       this.sendSuccessResponse(res, user);
     } catch (error) {
@@ -76,4 +81,5 @@ export default class AuthController extends BaseController {
       }
     }
   }
+  // Function to set tokens securely
 }

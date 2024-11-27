@@ -12,7 +12,7 @@ export default class EmailService {
     try {
       const mailOptions = {
         from: process.env.SMTP_USER,
-        to: "bishal05das@gmail.com",
+        to: "shrafid.532@gmail.com",
         subject,
         html,
       };

@@ -10,6 +10,8 @@ const schema = z.object({
   SMTP_PORT: z.coerce.number(),
   SMTP_USER: z.string(),
   SMTP_PASS: z.string(),
+  COOKIE_SECRET: z.string(),
+  ENCRYPTION_KEY: z.string(),
 });
 
 export default schema;

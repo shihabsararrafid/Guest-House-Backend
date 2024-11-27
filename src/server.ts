@@ -8,6 +8,7 @@ import express, {
 } from "express";
 import helmet from "helmet";
 import { Server } from "http";
+import cookieParser from "cookie-parser";
 import { defineRoutes } from "./app";
 import config from "./configs";
 import prisma from "./libraries/db/prisma";
@@ -28,6 +29,7 @@ const createExpressApp = (): Express => {
   expressApp.use(helmet());
   expressApp.use(urlencoded({ extended: true }));
   expressApp.use(json());
+  expressApp.use(cookieParser(config.COOKIE_SECRET));
 
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`${req.method} ${req.originalUrl}`);

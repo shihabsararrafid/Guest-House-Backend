@@ -1,5 +1,8 @@
 import jwt, { SignOptions, VerifyOptions, JwtPayload } from "jsonwebtoken";
 import { InvalidTokenError, TokenExpiredError } from "./auth.error";
+import { createPrivateKey, KeyObject } from "node:crypto";
+import { CookieOptions, Response } from "express";
+import config from "../../../configs";
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
@@ -7,10 +10,18 @@ export interface TokenPair {
 export class JwtService {
   private readonly privateKey: string;
   private readonly publicKey: string;
+  private readonly decryptedPrivateKey: KeyObject;
+
+  // Development configuration
+  private readonly isDevelopment = config.NODE_ENV === "development";
 
   constructor(privateKey: string, publicKey: string) {
     this.privateKey = privateKey;
     this.publicKey = publicKey;
+    this.decryptedPrivateKey = createPrivateKey({
+      key: this.privateKey,
+      passphrase: "top secret",
+    });
   }
   /**
    * Generate token pair
@@ -43,21 +54,26 @@ export class JwtService {
     options: SignOptions = {}
   ): Promise<string> {
     const defaultOptions: SignOptions = {
-      algorithm: "ES256",
+      algorithm: "RS256",
       expiresIn: "24h",
       ...options,
     };
 
     return new Promise((resolve, reject) => {
-      jwt.sign(payload, this.privateKey, defaultOptions, (error, token) => {
-        if (error) {
-          reject(error);
-        } else if (token) {
-          resolve(token);
-        } else {
-          reject(new Error("Token generation failed"));
+      jwt.sign(
+        payload,
+        this.decryptedPrivateKey,
+        defaultOptions,
+        (error, token) => {
+          if (error) {
+            reject(error);
+          } else if (token) {
+            resolve(token);
+          } else {
+            reject(new Error("Token generation failed"));
+          }
         }
-      });
+      );
     });
   }
 
@@ -70,7 +86,7 @@ export class JwtService {
     options: VerifyOptions = {}
   ): Promise<object> {
     const defaultOptions: VerifyOptions = {
-      algorithms: ["ES256"],
+      algorithms: ["RS256"],
       ...options,
     };
 
@@ -164,5 +180,29 @@ export class JwtService {
       }
       throw new InvalidTokenError("Invalid refresh token");
     }
+  }
+  setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+    // Access token in memory-only cookie
+    // Short lived (15-60 minutes typically)
+    // Common cookie options
+    const cookieOptions = {
+      httpOnly: true, // Prevents JavaScript access
+      sameSite: this.isDevelopment ? "lax" : "strict", // CSRF protection
+      secure: !this.isDevelopment, // false in development, true in production  // Only sent over HTTPS
+      signed: true,
+    };
+    res.cookie("access_token", accessToken, {
+      ...(cookieOptions as CookieOptions),
+      maxAge: 900000, // 15 minutes
+      path: "/",
+    });
+
+    // Refresh token in HTTP-only cookie
+    // Longer lived (days/weeks)
+    res.cookie("refresh_token", refreshToken, {
+      ...(cookieOptions as CookieOptions),
+      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+      path: "/api/refresh", // Restricted path
+    });
   }
 }
