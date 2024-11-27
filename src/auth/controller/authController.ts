@@ -7,6 +7,7 @@ import EmailService from "../../domains/services/email.service";
 import { render } from "@react-email/components";
 import React from "react";
 import { JwtService } from "../../domains/services/auth/jwt.service";
+import { AuthCookie } from "../../domains/services/auth/auth.cookie";
 
 export default class AuthController extends BaseController {
   private authRepository: AuthRepository;
@@ -66,12 +67,8 @@ export default class AuthController extends BaseController {
         isActive: user.isActive,
         isEmailVerified: user.isEmailVerified,
       });
-      this.jwtService.setAuthCookies(
-        res,
-        token.accessToken,
-        token.refreshToken
-      );
-      console.log(token);
+      AuthCookie.setAuthCookies(res, token.accessToken, token.refreshToken);
+
       this.sendSuccessResponse(res, user);
     } catch (error) {
       if (error instanceof AppError) {
@@ -81,5 +78,20 @@ export default class AuthController extends BaseController {
       }
     }
   }
-  // Function to set tokens securely
+  async logoutUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      AuthCookie.removeAuthCookies(res);
+      this.sendSuccessResponse(res, "User Logged Out");
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
 }

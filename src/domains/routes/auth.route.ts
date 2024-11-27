@@ -33,4 +33,7 @@ router.post(
   validateRequest({ schema: loginSchema }),
   (req, res, next) => authController.loginUser(req, res, next)
 );
+router.post("/logout", (req, res, next) =>
+  authController.logoutUser(req, res, next)
+);
 export default router;

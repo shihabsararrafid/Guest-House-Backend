@@ -181,28 +181,4 @@ export class JwtService {
       throw new InvalidTokenError("Invalid refresh token");
     }
   }
-  setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
-    // Access token in memory-only cookie
-    // Short lived (15-60 minutes typically)
-    // Common cookie options
-    const cookieOptions = {
-      httpOnly: true, // Prevents JavaScript access
-      sameSite: this.isDevelopment ? "lax" : "strict", // CSRF protection
-      secure: !this.isDevelopment, // false in development, true in production  // Only sent over HTTPS
-      signed: true,
-    };
-    res.cookie("access_token", accessToken, {
-      ...(cookieOptions as CookieOptions),
-      maxAge: 900000, // 15 minutes
-      path: "/",
-    });
-
-    // Refresh token in HTTP-only cookie
-    // Longer lived (days/weeks)
-    res.cookie("refresh_token", refreshToken, {
-      ...(cookieOptions as CookieOptions),
-      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-      path: "/api/refresh", // Restricted path
-    });
-  }
 }
