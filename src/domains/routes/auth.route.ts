@@ -36,4 +36,7 @@ router.post(
 router.post("/logout", (req, res, next) =>
   authController.logoutUser(req, res, next)
 );
+router.post("/verify-email", (req, res, next) =>
+  authController.verifyEmail(req, res, next)
+);
 export default router;

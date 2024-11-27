@@ -80,9 +80,9 @@ export class JwtService {
   /**
    * Verify any token with specific options
    */
-  private async verifyToken(
+  async verifyToken(
     token: string,
-    secret: string,
+    secret = this.publicKey,
     options: VerifyOptions = {}
   ): Promise<object> {
     const defaultOptions: VerifyOptions = {
