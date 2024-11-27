@@ -34,12 +34,118 @@ model User {
   isEmailVerified    Boolean   @default(false)
   isActive           Boolean   @default(true)
   retryCount         Int       @default(0) 
+  bookings           Booking[]
 
 
   @@index([email,username,id])
   
 }
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TWIN
+  SUITE
+  DELUXE
+  PRESIDENTIAL
+}
 
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  RESERVED
+  CLEANING
+}
+enum BedType {
+  SINGLE
+  DOUBLE
+  QUEEN
+  KING
+  TWIN
+}
+
+model Room {
+  id          String      @id @default(cuid())
+  roomNumber  String      @unique
+  type        RoomType
+  status      RoomStatus  @default(AVAILABLE)
+  floor       Int
+  capacity    Int         @default(2)
+  pricePerNight Decimal   @db.Decimal(10, 2)
+  description String?
+  
+  // Room features
+  hasWifi         Boolean   @default(true)
+  hasAC           Boolean   @default(true)
+  hasTv           Boolean   @default(true)
+  hasRefrigerator Boolean   @default(true)
+  
+  // Dimensions and view
+  squareFootage   Float?
+  viewType        String?   // city view, garden view, etc.
+   // Bed relationship
+  beds          Bed[]       // One room can have multiple beds
+  // Maintenance and housekeeping
+  lastCleaned     DateTime?
+  lastMaintenance DateTime?
+  
+  // Booking related
+  isAvailable     Boolean   @default(true)
+  bookings        Booking[]
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([roomNumber, type, status])
+}
+
+model Booking {
+  id            String    @id @default(cuid())
+  room          Room      @relation(fields: [roomId], references: [id])
+  roomId        String
+  guest         User      @relation(fields: [guestId], references: [id])
+  guestId       String
+  checkIn       DateTime
+  checkOut      DateTime
+  totalPrice    Decimal   @db.Decimal(10, 2)
+  numberOfGuests Int
+  specialRequests String?
+  
+  // Booking status
+  status        BookingStatus @default(PENDING)
+  
+  // Payment status
+  isPaid        Boolean   @default(false)
+  paymentDate   DateTime?
+  paidAmount    Int      @default(0)
+  bookedMoney   Int      @default(0)
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([roomId, guestId, checkIn, checkOut])
+}
+model Bed {
+  id          String    @id @default(cuid())
+  bedType     BedType
+  quantity    Int       @default(1)
+  capacity    Int       // how many people can sleep in this bed type
+  
+  // Relationship with Room
+  room        Room      @relation(fields: [roomId], references: [id])
+  roomId      String
+
+  @@index([roomId])
+}
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
 
 
 enum Role {
