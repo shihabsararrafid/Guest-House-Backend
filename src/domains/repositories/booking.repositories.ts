@@ -1,12 +1,13 @@
 import {
   bookRoomsSchema,
   getAvailableBookingSchema,
+  getBookingsSchemaAdmin,
 } from "./../interfaces/booking.interface";
 import { Bed, Booking, PrismaClient, Room } from "@prisma/client";
 import { AppError } from "../../libraries/error-handling/AppError";
 import { BaseRepository } from "./BaseRepositories";
 import { z } from "zod";
-import { add } from "date-fns";
+import { add, differenceInDays } from "date-fns";
 
 export default class BookingRepository extends BaseRepository<Booking> {
   constructor(prisma: PrismaClient) {
@@ -106,8 +107,16 @@ export default class BookingRepository extends BaseRepository<Booking> {
       const checkOutTime = add(new Date(others.checkOut), {
         hours: 11,
       });
+      const totalStay = differenceInDays(
+        add(new Date(checkOutTime), {
+          hours: 1,
+        }),
+        checkInTime
+      );
+      console.log(totalStay);
       const result = await prisma.$transaction(async (tx) => {
         for (const r of rooms) {
+          // check whether room is booked or not , or whether room exists or not
           const room = await tx.room.findUnique({
             where: {
               id: r.id,
@@ -133,17 +142,23 @@ export default class BookingRepository extends BaseRepository<Booking> {
               404
             );
           }
-          total += room.pricePerNight;
+          total += r.pricePerNight * totalStay;
           const { id, ...d } = r;
           roomInfo.push({ ...d, roomId: id });
         }
+        const discount = others.discount ?? 0;
+        const discountType = others.discountType ?? "Amount";
+        const totalAmountWithDiscount =
+          total -
+          (discountType === "Amount" ? discount : (discount * total) / 100);
         const booking = await this.prisma.booking.create({
           data: {
             ...others,
             totalPrice: total,
+            totalPriceWithDiscount: totalAmountWithDiscount,
             guestId,
-            discount: others.discount ?? 0,
-            discountType: others.discountType ?? "Amount",
+            discount: discount ?? 0,
+            discountType: discountType ?? "Amount",
             checkIn: checkInTime,
             checkOut: checkOutTime,
             rooms: {
@@ -169,7 +184,6 @@ export default class BookingRepository extends BaseRepository<Booking> {
         );
       }
     }
-    throw new Error("Method not implemented.");
   }
   async update(id: string, data: Partial<Booking>): Promise<any> {
     throw new Error("Method not implemented.");
@@ -210,6 +224,69 @@ export default class BookingRepository extends BaseRepository<Booking> {
         },
       });
       return roomsAvailableForDates;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get list of rooms: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
+  }
+  async getAdminBookedRooms(
+    data: z.infer<typeof getBookingsSchemaAdmin>
+  ): Promise<Partial<Booking>[]> {
+    try {
+      let query = {};
+
+      if (data.checkIn) {
+        const checkInTime = add(new Date(data.checkIn), {
+          hours: 12,
+        });
+        query = { checkIn: { gte: checkInTime } };
+      }
+      if (data.checkOut) {
+        const checkOutTime = add(new Date(data.checkOut), {
+          hours: 11,
+        });
+        query = { ...query, checkOut: { lte: checkOutTime } };
+      }
+      if (data.isPaid === true || data.isPaid === false) {
+        query = { ...query, isPaid: data.isPaid };
+      }
+      if (data.guestId) {
+        query = { ...query, guestId: data.guestId };
+      }
+      if (data.bookingStatus) {
+        query = { ...query, status: data.bookingStatus };
+      }
+      if (data.roomId) {
+        query = {
+          ...query,
+          rooms: {
+            roomId: data.roomId,
+          },
+        };
+      }
+
+      const bookings = await this.prisma.booking.findMany({
+        where: query,
+        include: {
+          rooms: {
+            include: {
+              room: {
+                select: { roomNumber: true },
+              },
+            },
+          },
+        },
+      });
+      return bookings;
     } catch (error) {
       if (error instanceof AppError) {
         throw error;

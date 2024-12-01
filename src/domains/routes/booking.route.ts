@@ -13,6 +13,7 @@ import BookingController from "../controllers/booking.controller";
 import {
   bookRoomsSchema,
   getAvailableBookingSchema,
+  getBookingsSchemaAdmin,
 } from "../interfaces/booking.interface";
 
 const router = express.Router();
@@ -25,9 +26,11 @@ router.post(
   validateRequest({ schema: bookRoomsSchema }),
   (req, res, next) => bookingController.bookRooms(req, res, next)
 );
-// router.get("/get-all-rooms", (req, res, next) =>
-//   authController.getAllRooms(req, res, next)
-// );
+router.get(
+  "/get-admin-bookings",
+  validateRequest({ schema: getBookingsSchemaAdmin, isQuery: true }),
+  (req, res, next) => bookingController.getBookedRoomsAdmin(req, res, next)
+);
 router.get(
   "/get-available-rooms",
   validateRequest({ schema: getAvailableBookingSchema, isQuery: true }),

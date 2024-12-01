@@ -109,6 +109,7 @@ model Booking {
   checkIn       DateTime
   checkOut      DateTime
   totalPrice    Int
+  totalPriceWithDiscount Int           
   discount      Int
   discountType  String
   // Booking status
@@ -155,8 +156,8 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  ON_GOING
   COMPLETED
-  NO_SHOW
 }
 
 

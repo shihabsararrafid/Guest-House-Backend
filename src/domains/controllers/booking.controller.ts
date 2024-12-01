@@ -6,9 +6,11 @@ import { z } from "zod";
 import {
   bookRoomsSchema,
   getAvailableBookingSchema,
+  getBookingsSchemaAdmin,
 } from "../interfaces/booking.interface";
 type availableRoomsQuery = z.infer<typeof getAvailableBookingSchema>;
 type bookRoomsSchema = z.infer<typeof bookRoomsSchema>;
+type getAdminBookingsSchema = z.infer<typeof getBookingsSchemaAdmin>;
 export default class BookingController extends BaseController {
   private bookingRepository: BookingRepository;
 
@@ -43,6 +45,25 @@ export default class BookingController extends BaseController {
       // console.log(req.body);
       const room = await this.bookingRepository.bookRooms(
         req.body as unknown as bookRoomsSchema
+      );
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
+  async getBookedRoomsAdmin(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // console.log(req.body);
+      const room = await this.bookingRepository.getAdminBookedRooms(
+        req.query as unknown as getAdminBookingsSchema
       );
       this.sendSuccessResponse(res, room);
     } catch (error) {
