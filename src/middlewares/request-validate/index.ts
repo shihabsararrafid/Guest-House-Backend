@@ -16,6 +16,7 @@ function validateRequest({
 }: ValidateRequestOptions) {
   return (req: Request, res: Response, next: NextFunction) => {
     const input = isQuery ? req.query : isParam ? req.params : req.body;
+    // console.log(input);
     try {
       const validationResult = schema.parse(input);
     } catch (error) {

@@ -72,7 +72,7 @@ model Room {
   status      RoomStatus  @default(AVAILABLE)
   floor       Int? 
   capacity    Int         @default(2)
-  pricePerNight Decimal   @db.Decimal(10, 2)
+  pricePerNight Int
   description String?
   
   // Room features
@@ -92,7 +92,7 @@ model Room {
   
   // Booking related
   isAvailable     Boolean   @default(true)
-  bookings        Booking[]
+  bookings        BookingRoom[]
   
   // Metadata
   createdAt       DateTime  @default(now())
@@ -103,30 +103,41 @@ model Room {
 
 model Booking {
   id            String    @id @default(cuid())
-  room          Room      @relation(fields: [roomId], references: [id])
-  roomId        String
+  rooms         BookingRoom[]
   guest         User      @relation(fields: [guestId], references: [id])
   guestId       String
   checkIn       DateTime
   checkOut      DateTime
-  totalPrice    Decimal   @db.Decimal(10, 2)
-  numberOfGuests Int
-  specialRequests String?
-  
+  totalPrice    Int
+  discount      Int
+  discountType  String
   // Booking status
   status        BookingStatus @default(PENDING)
-  
   // Payment status
   isPaid        Boolean   @default(false)
   paymentDate   DateTime?
   paidAmount    Int      @default(0)
   bookedMoney   Int      @default(0)
-  
   // Metadata
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  @@index([roomId, guestId, checkIn, checkOut])
+  @@index([ guestId, checkIn, checkOut])
+}
+model BookingRoom {
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+  bookingId     String
+  room          Room      @relation(fields: [roomId], references: [id])
+  roomId        String
+  // Additional fields specific to the room booking can go here
+  pricePerNight Int // Price when booked (may differ from room's current price)
+  numberOfGuests Int?
+  specialRequests String?
+  createdAt     DateTime @default(now())
+
+  @@id([bookingId, roomId])
+  @@index([bookingId])
+  @@index([roomId])
 }
 model Bed {
   id          String    @id @default(cuid())

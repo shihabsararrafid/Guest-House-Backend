@@ -3,8 +3,12 @@ import { AppError } from "../../libraries/error-handling/AppError";
 import BookingRepository from "../repositories/booking.repositories";
 import { BaseController } from "./base.controller";
 import { z } from "zod";
-import { getAvailableBookingSchema } from "../interfaces/booking.interface";
+import {
+  bookRoomsSchema,
+  getAvailableBookingSchema,
+} from "../interfaces/booking.interface";
 type availableRoomsQuery = z.infer<typeof getAvailableBookingSchema>;
+type bookRoomsSchema = z.infer<typeof bookRoomsSchema>;
 export default class BookingController extends BaseController {
   private bookingRepository: BookingRepository;
 
@@ -20,6 +24,25 @@ export default class BookingController extends BaseController {
     try {
       const room = await this.bookingRepository.getAvailableRooms(
         req.query as unknown as availableRoomsQuery
+      );
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
+  async bookRooms(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      // console.log(req.body);
+      const room = await this.bookingRepository.bookRooms(
+        req.body as unknown as bookRoomsSchema
       );
       this.sendSuccessResponse(res, room);
     } catch (error) {
