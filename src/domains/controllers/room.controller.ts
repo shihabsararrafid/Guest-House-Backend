@@ -26,4 +26,37 @@ export default class RoomController extends BaseController {
       }
     }
   }
+  async getAllRooms(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const rooms = await this.roomRepository.getAll();
+      this.sendSuccessResponse(res, rooms);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
+  async getSingleRoom(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const room = await this.roomRepository.getById(id);
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
 }

@@ -16,5 +16,11 @@ router.post(
   validateRequest({ schema: createRoomSchema }),
   (req, res, next) => authController.creteRoom(req, res, next)
 );
+router.get("/get-all-rooms", (req, res, next) =>
+  authController.getAllRooms(req, res, next)
+);
+router.get("/get-single-room/:id", (req, res, next) =>
+  authController.getSingleRoom(req, res, next)
+);
 
 export default router;
