@@ -6,11 +6,16 @@ import { Schema, z } from "zod";
 interface ValidateRequestOptions {
   schema: Schema;
   isParam?: boolean;
+  isQuery?: boolean;
 }
 
-function validateRequest({ schema, isParam = false }: ValidateRequestOptions) {
+function validateRequest({
+  schema,
+  isParam = false,
+  isQuery = false,
+}: ValidateRequestOptions) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const input = isParam ? req.params : req.body;
+    const input = isQuery ? req.query : isParam ? req.params : req.body;
     try {
       const validationResult = schema.parse(input);
     } catch (error) {

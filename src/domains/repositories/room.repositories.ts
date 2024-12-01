@@ -1,8 +1,6 @@
 import { Bed, PrismaClient, Room } from "@prisma/client";
 import { AppError } from "../../libraries/error-handling/AppError";
 import { BaseRepository } from "./BaseRepositories";
-import { z } from "zod";
-import { createRoomSchema } from "../interfaces/room.interface";
 
 export default class RoomRepository extends BaseRepository<Room> {
   constructor(prisma: PrismaClient) {
