@@ -93,17 +93,26 @@ export default class BookingRepository extends BaseRepository<Booking> {
     query: z.infer<typeof getAvailableBookingSchema>
   ): Promise<any> {
     try {
-      const { checkIn, checkOut, capacityArray } = query;
+      const { checkIn, checkOut, capacity } = query;
+      const checkInTime = new Date(checkIn);
+      const checkOutTime = new Date(checkOut);
+      const capacityArray = (JSON.parse(capacity) as number[]).sort(
+        (a, b) => a - b
+      );
+      const len = capacityArray.length;
+      const lowCapacity = capacityArray[0];
+      const highCapacity = capacityArray[len - 1];
       const roomsAvailableForDates = await prisma.room.findMany({
         where: {
           bookings: {
             none: {
               AND: [
-                { checkIn: { lte: checkIn } },
-                { checkOut: { gte: checkOut } },
+                { checkIn: { lte: checkInTime } },
+                { checkOut: { gte: checkOutTime } },
               ],
             },
           },
+          OR: [{ capacity: { gte: lowCapacity, lte: highCapacity } }],
         },
       });
       return roomsAvailableForDates;
