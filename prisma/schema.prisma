@@ -67,9 +67,10 @@ enum BedType {
 model Room {
   id          String      @id @default(cuid())
   roomNumber  String      @unique
+  roomName    String?
   type        RoomType
   status      RoomStatus  @default(AVAILABLE)
-  floor       Int
+  floor       Int? 
   capacity    Int         @default(2)
   pricePerNight Decimal   @db.Decimal(10, 2)
   description String?
