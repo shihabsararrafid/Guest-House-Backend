@@ -36,9 +36,12 @@ router.get(
   validateRequest({ schema: getAvailableBookingSchema, isQuery: true }),
   (req, res, next) => bookingController.getAvailableRooms(req, res, next)
 );
-// router.delete("/:id", (req, res, next) =>
-//   authController.deleteRoom(req, res, next)
-// );
+router.delete("/:id", (req, res, next) =>
+  bookingController.deleteBooking(req, res, next)
+);
+router.get("/:id", (req, res, next) =>
+  bookingController.getSingleBooking(req, res, next)
+);
 // router.patch(
 //   "/:id",
 //   validateRequest({ schema: updateRoomSchema }),

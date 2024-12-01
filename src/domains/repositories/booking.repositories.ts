@@ -14,46 +14,34 @@ export default class BookingRepository extends BaseRepository<Booking> {
     super(prisma);
   }
   async getAll(): Promise<Partial<Booking>[]> {
-    // try {
-    //   const rooms = await this.prisma.room.findMany({
-    //     where: {},
-    //   });
-    //   return rooms;
-    // } catch (error) {
-    //   if (error instanceof AppError) {
-    //     throw error;
-    //   } else {
-    //     throw new AppError(
-    //       "database-error",
-    //       `Failed to get list of rooms: ${
-    //         error instanceof Error ? error.message : "Unexpected error"
-    //       }`,
-    //       500
-    //     );
-    //   }
-    // }
     throw new Error("Method not implemented.");
   }
   async getById(id: string): Promise<Partial<Booking> | null> {
-    // try {
-    //   const room = await this.prisma.room.findUnique({
-    //     where: { id },
-    //   });
-    //   return room;
-    // } catch (error) {
-    //   if (error instanceof AppError) {
-    //     throw error;
-    //   } else {
-    //     throw new AppError(
-    //       "database-error",
-    //       `Failed to get the room info: ${
-    //         error instanceof Error ? error.message : "Unexpected error"
-    //       }`,
-    //       500
-    //     );
-    //   }
-    // }
-    throw new Error("Method not implemented.");
+    try {
+      const booking = await this.prisma.booking.findUnique({
+        where: { id },
+        include: {
+          rooms: {
+            include: {
+              room: true,
+            },
+          },
+        },
+      });
+      return booking;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get the room info: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
   }
   async create(data: Partial<Booking>): Promise<Partial<Booking>> {
     // generate salt and hashed password
@@ -189,7 +177,31 @@ export default class BookingRepository extends BaseRepository<Booking> {
     throw new Error("Method not implemented.");
   }
   async delete(id: string): Promise<any> {
-    throw new Error("Method not implemented.");
+    try {
+      const r = await this.prisma.$transaction([
+        this.prisma.bookingRoom.deleteMany({
+          where: {
+            bookingId: id,
+          },
+        }),
+        this.prisma.booking.delete({
+          where: { id },
+        }),
+      ]);
+      return r;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get the room info: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
   }
   async getAvailableRooms(
     query: z.infer<typeof getAvailableBookingSchema>

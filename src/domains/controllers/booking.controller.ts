@@ -42,7 +42,6 @@ export default class BookingController extends BaseController {
     next: NextFunction
   ): Promise<void> {
     try {
-      // console.log(req.body);
       const room = await this.bookingRepository.bookRooms(
         req.body as unknown as bookRoomsSchema
       );
@@ -90,40 +89,40 @@ export default class BookingController extends BaseController {
   //       }
   //     }
   //   }
-  //   async getSingleRoom(
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ): Promise<void> {
-  //     try {
-  //       const { id } = req.params;
-  //       const room = await this.roomRepository.getById(id);
-  //       this.sendSuccessResponse(res, room);
-  //     } catch (error) {
-  //       if (error instanceof AppError) {
-  //         this.sendErrorResponse(res, error);
-  //       } else {
-  //         next(error);
-  //       }
-  //     }
-  //   }
-  //   async deleteRoom(
-  //     req: Request,
-  //     res: Response,
-  //     next: NextFunction
-  //   ): Promise<void> {
-  //     try {
-  //       const { id } = req.params;
-  //       const room = await this.roomRepository.delete(id);
-  //       this.sendSuccessResponse(res, room);
-  //     } catch (error) {
-  //       if (error instanceof AppError) {
-  //         this.sendErrorResponse(res, error);
-  //       } else {
-  //         next(error);
-  //       }
-  //     }
-  //   }
+  async getSingleBooking(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const room = await this.bookingRepository.getById(id);
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
+  async deleteBooking(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const room = await this.bookingRepository.delete(id);
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
   //   async updateRoom(
   //     req: Request,
   //     res: Response,
