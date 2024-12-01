@@ -58,6 +58,45 @@ export const createRoomSchema = z.object({
       }
     ),
 });
+export const updateRoomSchema = z.object({
+  roomNumber: z.string().min(1, "Room number is required").optional(),
+  type: RoomTypeEnum,
+  status: RoomStatusEnum.optional().optional(),
+  floor: z
+    .number()
+    .int()
+    .positive("Floor must be a positive number")
+    .optional(),
+  capacity: z.number().int().positive().optional(),
+  pricePerNight: z.number().optional(),
+  description: z.string().optional(),
+  // Room features
+  hasWifi: z.boolean().optional(),
+  hasAC: z.boolean().optional(),
+  hasTv: z.boolean().optional(),
+  hasRefrigerator: z.boolean().optional(),
+  // Dimensions and view
+  squareFootage: z.number().positive().optional(),
+  viewType: z.string().optional(),
+  // Bed configuration
+  beds: z
+    .array(BedSchema)
+    .min(1, "At least one bed configuration is required")
+    .refine(
+      (beds) => {
+        // Calculate total capacity from beds
+        const totalCapacity = beds.reduce(
+          (sum, bed) => sum + bed.quantity * bed.capacity,
+          0
+        );
+        return totalCapacity > 0;
+      },
+      {
+        message: "Total bed capacity must be greater than 0",
+      }
+    )
+    .optional(),
+});
 
 // Type inference
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;

@@ -3,7 +3,10 @@ import express from "express";
 import prisma from "../../libraries/db/prisma";
 import { validateRequest } from "../../middlewares/request-validate";
 import RoomController from "../controllers/room.controller";
-import { createRoomSchema } from "../interfaces/room.interface";
+import {
+  createRoomSchema,
+  updateRoomSchema,
+} from "../interfaces/room.interface";
 import RoomRepository from "../repositories/room.repositories";
 
 const router = express.Router();
@@ -19,8 +22,16 @@ router.post(
 router.get("/get-all-rooms", (req, res, next) =>
   authController.getAllRooms(req, res, next)
 );
-router.get("/get-single-room/:id", (req, res, next) =>
+router.get("/:id", (req, res, next) =>
   authController.getSingleRoom(req, res, next)
+);
+router.delete("/:id", (req, res, next) =>
+  authController.deleteRoom(req, res, next)
+);
+router.patch(
+  "/:id",
+  validateRequest({ schema: updateRoomSchema }),
+  (req, res, next) => authController.updateRoom(req, res, next)
 );
 
 export default router;

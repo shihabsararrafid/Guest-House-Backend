@@ -80,10 +80,69 @@ export default class RoomRepository extends BaseRepository<Room> {
       }
     }
   }
-  update(id: string, data: Partial<Room>): Promise<Partial<Room>> {
-    throw new Error("Method not implemented.");
+  async update(id: string, data: Partial<Room>): Promise<Partial<Room>> {
+    try {
+      const room = await this.prisma.room.findUnique({
+        where: { id },
+      });
+      if (!room) {
+        // precondition failed -412
+        throw new AppError("database-error", "Room not found", 412);
+      }
+      const updatedRoom = await this.prisma.room.update({
+        where: { id },
+        data: data,
+      });
+      return updatedRoom;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get the room info: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
   }
-  delete(id: string): Promise<Partial<Room>> {
-    throw new Error("Method not implemented.");
+  async delete(id: string): Promise<any> {
+    try {
+      const room = await this.prisma.room.findUnique({
+        where: { id },
+      });
+      if (!room) {
+        // precondition failed -412
+        throw new AppError("database-error", "Room not found", 412);
+      }
+      const t = await this.prisma.$transaction([
+        this.prisma.bed.deleteMany({
+          where: {
+            room: {
+              id: id,
+            },
+          },
+        }),
+        this.prisma.room.delete({
+          where: { id },
+        }),
+      ]);
+
+      return t;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get the room info: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
   }
 }
