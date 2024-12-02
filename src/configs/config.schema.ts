@@ -13,6 +13,7 @@ const schema = z.object({
   COOKIE_SECRET: z.string(),
   ENCRYPTION_KEY: z.string(),
   CLIENT_URL: z.string(),
+  STRIPE_SECRET_KEY: z.string(),
 });
 
 export default schema;

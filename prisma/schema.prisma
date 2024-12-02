@@ -105,6 +105,7 @@ model Room {
 model Booking {
   id            String    @id @default(cuid())
   rooms         BookingRoom[]
+  transaction   PaymentTransaction[]
   guest         User      @relation(fields: [guestId], references: [id])
   guestId       String
   checkIn       DateTime
@@ -169,7 +170,18 @@ model PaymentTransaction {
   type          PaymentType     @default(value:PAYMENT)// e.g., "PAYMENT", "REFUND", "CHARGEBACK"
   description   String?
   metadata      Json?     
+  // Stripe specific fields
+  stripePaymentIntentId String?        @unique
+  stripeCustomerId      String?
+  stripePaymentMethodId String?
+  stripeFees            Int?           // in cents
+  stripeReceiptUrl      String?
+  last4                 String?        // last 4 digits of card
+  paymentMethod         String?        // card, bank_transfer, wallet
+  cardBrand             String?        // visa, mastercard, etc.
   
+  // Error handling
+  errorMessage          String?
   // Timestamps
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -177,6 +189,8 @@ model PaymentTransaction {
   // Relations (examples - uncomment and modify as needed)
   user          User        @relation(fields: [userId], references: [id])
   userId        String
+  booking          Booking        @relation(fields: [bookingId], references: [id])
+  bookingId        String
   
   @@map("payment_transactions")
 }
