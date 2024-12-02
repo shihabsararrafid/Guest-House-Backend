@@ -25,6 +25,9 @@
   "keywords": [],
   "author": "Shihab Sarar Islam Rafid",
   "license": "ISC",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^5.19.1",
     "@react-email/components": "^0.0.28",
