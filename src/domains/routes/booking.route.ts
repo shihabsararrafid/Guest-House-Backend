@@ -15,6 +15,7 @@ import {
   getAvailableBookingSchema,
   getBookingsSchemaAdmin,
 } from "../interfaces/booking.interface";
+import { checkAuth } from "../../middlewares/auth/checkAuth";
 
 const router = express.Router();
 const bookingRepository = new BookingRepository(prisma);
@@ -23,6 +24,7 @@ const bookingController = new BookingController(bookingRepository);
 
 router.post(
   "/book-rooms",
+  checkAuth(),
   validateRequest({ schema: bookRoomsSchema }),
   (req, res, next) => bookingController.bookRooms(req, res, next)
 );

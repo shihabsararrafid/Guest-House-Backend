@@ -8,6 +8,7 @@ import { AppError } from "../../libraries/error-handling/AppError";
 import { BaseRepository } from "./BaseRepositories";
 import { z } from "zod";
 import { add, differenceInDays } from "date-fns";
+import { AuthPayload } from "../interfaces/auth.interface";
 
 export default class BookingRepository extends BaseRepository<Booking> {
   constructor(prisma: PrismaClient) {
@@ -77,13 +78,14 @@ export default class BookingRepository extends BaseRepository<Booking> {
     throw new Error("Method not implemented.");
   }
   async bookRooms(
-    data: z.infer<typeof bookRoomsSchema>
-  ): Promise<Partial<Booking>> {
+    data: z.infer<typeof bookRoomsSchema>,
+    userPayload: AuthPayload
+  ): Promise<any> {
     try {
       const { rooms, ...others } = data;
       let total = 0;
       console.log(others);
-      const guestId = "cm3zd9gya0000ofi0zwwp6cmi";
+      const guestId = userPayload.id;
       const roomInfo: {
         roomId: string;
         numberOfGuests: number;
@@ -139,7 +141,7 @@ export default class BookingRepository extends BaseRepository<Booking> {
         const totalAmountWithDiscount =
           total -
           (discountType === "Amount" ? discount : (discount * total) / 100);
-        const booking = await this.prisma.booking.create({
+        const booking = await tx.booking.create({
           data: {
             ...others,
             totalPrice: total,
@@ -152,6 +154,13 @@ export default class BookingRepository extends BaseRepository<Booking> {
             rooms: {
               createMany: {
                 data: roomInfo,
+              },
+            },
+          },
+          include: {
+            rooms: {
+              include: {
+                room: true,
               },
             },
           },

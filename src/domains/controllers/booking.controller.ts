@@ -8,9 +8,15 @@ import {
   getAvailableBookingSchema,
   getBookingsSchemaAdmin,
 } from "../interfaces/booking.interface";
+import { render } from "@react-email/components";
+import React from "react";
+import BookingConfirmationEmail from "../../react-mail-templates/booking-notification";
+import EmailService from "../services/email.service";
 type availableRoomsQuery = z.infer<typeof getAvailableBookingSchema>;
 type bookRoomsSchema = z.infer<typeof bookRoomsSchema>;
 type getAdminBookingsSchema = z.infer<typeof getBookingsSchemaAdmin>;
+const emailService = new EmailService();
+
 export default class BookingController extends BaseController {
   private bookingRepository: BookingRepository;
 
@@ -42,8 +48,57 @@ export default class BookingController extends BaseController {
     next: NextFunction
   ): Promise<void> {
     try {
+      const userPayload = req.user;
       const room = await this.bookingRepository.bookRooms(
-        req.body as unknown as bookRoomsSchema
+        req.body as unknown as bookRoomsSchema,
+        userPayload
+      );
+      // console.log(room, "room");
+      const {
+        id,
+        checkIn,
+        checkOut,
+        totalPrice,
+        totalPriceWithDiscount,
+        discount,
+        discountType,
+        paidAmount,
+        status,
+        rooms,
+      } = room;
+      // console.log(rooms);
+      const d = rooms.map((r: any) => ({
+        roomNumber: r.room.roomNumber,
+        pricePerNight: r.pricePerNight,
+        numberOfGuests: r.numberOfGuests,
+        specialRequests: r.specialRequests,
+        hasWifi: r.room.hasWifi,
+        hasAC: r.room.hasAC,
+        hasTv: r.room.hasTv,
+        hasRefrigerator: r.room.hasRefrigerator,
+      }));
+      const data = {
+        bookingId: id,
+        checkIn,
+        checkOut,
+        totalPrice,
+        totalPriceWithDiscount,
+        discount,
+        discountType,
+        paidAmount,
+        status,
+        rooms: d,
+      };
+      // console.log(data);
+      const emailHtml = await render(
+        // @ts-ignore
+        React.createElement(BookingConfirmationEmail, data)
+      );
+      // const html = await render(<WelcomeEmail />);
+      emailService.sendEmail(
+        "shrafid.532@gmail.com",
+        "Your Booking Information",
+        emailHtml
       );
       this.sendSuccessResponse(res, room);
     } catch (error) {
