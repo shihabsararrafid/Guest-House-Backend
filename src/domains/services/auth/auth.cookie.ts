@@ -18,6 +18,7 @@ export const AuthCookie = {
       ...(cookieOptions as CookieOptions),
       maxAge: 900000, // 15 minutes
       path: "/",
+      // signed: true,
     });
 
     // Refresh token in HTTP-only cookie
@@ -25,7 +26,7 @@ export const AuthCookie = {
     res.cookie("refresh_token", refreshToken, {
       ...(cookieOptions as CookieOptions),
       maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-      path: "/api/v1/auth/refresh", // Restricted path
+      path: "/api/v1", // Restricted path
     });
   },
   removeAuthCookies(res: Response) {

@@ -15,3 +15,14 @@ export const loginSchema = z
     message: "Either username or email must be provided",
     path: ["username", "email"],
   });
+export interface AuthPayload {
+  email: string;
+  username: string | null;
+  role: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  id: string;
+  type: "access" | "refresh";
+  iat: number;
+  exp: number;
+}

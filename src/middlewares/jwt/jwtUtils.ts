@@ -1,14 +1,8 @@
 import fs from "fs";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 
-const privateKey = fs.readFileSync(
-  "./../../../secretKeys/tokenECPrivate.pem",
-  "utf-8"
-);
-const publicKey = fs.readFileSync(
-  "./../../../secretKeys/tokenECPublic.pem",
-  "utf-8"
-);
+const privateKey = fs.readFileSync("secretKeys/tokenECPrivate.pem", "utf-8");
+const publicKey = fs.readFileSync("secretKeys/tokenECPublic.pem", "utf-8");
 // Make a token
 export const signToken = (payload: object, expireTime = 604800) => {
   // Return Promise

@@ -31,11 +31,11 @@ export class JwtService {
   async generateTokenPair(userData: object): Promise<TokenPair> {
     const accessToken = await this.generateToken(
       { ...userData, type: "access" },
-      { expiresIn: "7d" }
+      { expiresIn: "20s" }
     );
     const refreshToken = await this.generateToken(
       { ...userData, type: "refresh" },
-      { expiresIn: "3h" }
+      { expiresIn: "7d" }
     );
 
     return {
