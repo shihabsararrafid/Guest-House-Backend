@@ -34,6 +34,14 @@ export const bookRoomsSchema = z.object({
     })
   ),
 });
+export const updateBookingSchema = z.object({
+  checkIn: z.coerce.date(),
+  checkOut: z.coerce.date(),
+  discount: z.number().default(0),
+  discountType: z.enum(["Percentage", "Amount"]).default("Percentage"),
+  bookedMoney: z.number().default(0),
+  paidAmount: z.number().default(0),
+});
 export const getBookingsSchemaAdmin = z.object({
   checkIn: z.coerce.date().optional(),
   checkOut: z.coerce.date().optional(),

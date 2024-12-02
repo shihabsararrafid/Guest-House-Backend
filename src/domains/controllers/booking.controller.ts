@@ -19,7 +19,6 @@ const emailService = new EmailService();
 
 export default class BookingController extends BaseController {
   private bookingRepository: BookingRepository;
-
   constructor(bookingRepository: BookingRepository) {
     super();
     this.bookingRepository = bookingRepository;
