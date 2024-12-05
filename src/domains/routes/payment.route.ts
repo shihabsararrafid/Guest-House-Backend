@@ -6,9 +6,11 @@ import { validateRequest } from "../../middlewares/request-validate";
 import PaymentController from "../controllers/payment.controller";
 import { paymentTransactionSchema } from "../interfaces/payment.interface";
 import PaymentRepository from "../repositories/payment.repositories";
+import { WebhookController } from "../controllers/webhook.controller";
 
 const router = express.Router();
 const paymentRepository = new PaymentRepository(prisma);
+const webHookController = new WebhookController(prisma);
 
 const paymentController = new PaymentController(paymentRepository);
 
@@ -17,6 +19,10 @@ router.post(
   checkAuth(["SUPERADMIN", "USER"]),
   validateRequest({ schema: paymentTransactionSchema }),
   (req, res, next) => paymentController.createPayments(req, res, next)
+);
+router.post(
+  "/webhook",
+  (req, res, next) => webHookController.handleStripeWebhook(req, res, next)
 );
 
 export default router;

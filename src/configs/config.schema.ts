@@ -14,6 +14,7 @@ const schema = z.object({
   ENCRYPTION_KEY: z.string(),
   CLIENT_URL: z.string(),
   STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
 });
 
 export default schema;

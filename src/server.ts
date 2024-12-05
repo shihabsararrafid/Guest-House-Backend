@@ -7,6 +7,7 @@ import express, {
   urlencoded,
 } from "express";
 import helmet from "helmet";
+import cors from "cors";
 import { Server } from "http";
 import cookieParser from "cookie-parser";
 import { defineRoutes } from "./app";
@@ -30,6 +31,13 @@ const createExpressApp = (): Express => {
   expressApp.use(urlencoded({ extended: true }));
   expressApp.use(json());
   expressApp.use(cookieParser(config.COOKIE_SECRET));
+  // Setup cors
+  expressApp.use(
+    cors({
+      origin: [config.CLIENT_URL, "http://localhost:5173"],
+      credentials: true,
+    })
+  );
 
   expressApp.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`${req.method} ${req.originalUrl}`);

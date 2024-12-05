@@ -13,15 +13,14 @@ const jwtService = new JwtService(privateKey, publicKey);
 export const checkAuth = (types?: string[], required = true) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      //   console.log(req.signedCookies.access_token);
+      // console.log(req);
       const token =
         req.signedCookies.access_token ??
+        req.cookies.access_token ??
         req.header("authentication")?.split(" ")[1];
+      // console.log(token, "token");
+      if (!token) throw new AppError("Auth-error", "You Are Unauthorized", 401);
 
-      if (!token)
-        if (required)
-          throw new AppError("Auth-error", "You Are Unauthorized", 401);
-        else return next();
       const payload = (await jwtService.verifyToken(token)) as AuthPayload;
       req.user = payload;
 
@@ -34,8 +33,10 @@ export const checkAuth = (types?: string[], required = true) => {
       }
       return next();
     } catch (error) {
+      console.log(console.error(error));
       if (error instanceof Error && error.message === "Token has expired") {
-        const refresh_token = req.signedCookies.refresh_token;
+        const refresh_token =
+          req.signedCookies.refresh_token ?? req.cookies.refresh_token;
         if (!refresh_token)
           throw new AppError("Token Not Found", "No Refresh token found", 401);
         try {
@@ -59,6 +60,8 @@ export const checkAuth = (types?: string[], required = true) => {
         } catch (error) {
           next(error);
         }
+      } else {
+        next(error);
       }
       //   console.error(error.message);
       //   next(error);

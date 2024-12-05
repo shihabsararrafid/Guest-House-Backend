@@ -17,6 +17,7 @@ model User {
   role      Role    @default(value:USER)
   department String @default("")
   roll       String?
+  phone      String?
   firstName          String?
   lastName           String?
   currentPosition    String?

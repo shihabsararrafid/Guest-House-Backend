@@ -53,7 +53,8 @@ export default class AuthController extends BaseController {
       const emailHtml = await render(
         React.createElement(WelcomeEmail, {
           verificationUrl:
-            config.CLIENT_URL + `auth??verify=${user.email}&token=${token}`,
+            config.CLIENT_URL +
+            `auth/verify-email?email=${user.email}&token=${token}`,
         })
       );
       // const html = await render(<WelcomeEmail />);
@@ -87,9 +88,14 @@ export default class AuthController extends BaseController {
         isEmailVerified: user.isEmailVerified,
         id: user.id,
       });
+
       AuthCookie.setAuthCookies(res, token.accessToken, token.refreshToken);
 
-      this.sendSuccessResponse(res, user);
+      this.sendSuccessResponse(res, {
+        ...user,
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+      });
     } catch (error) {
       if (error instanceof AppError) {
         this.sendErrorResponse(res, error);

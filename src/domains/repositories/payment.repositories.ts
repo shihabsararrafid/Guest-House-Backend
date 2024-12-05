@@ -58,7 +58,10 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
         });
 
         // Return payment response (contains clientSecret for frontend)
-        return paymentTransaction;
+        return {
+          ...paymentTransaction,
+          client_secret: paymentResponse.clientSecret,
+        };
       });
 
       return result;

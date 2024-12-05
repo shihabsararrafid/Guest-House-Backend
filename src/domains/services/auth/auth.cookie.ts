@@ -4,9 +4,9 @@ import config from "../../../configs";
 const isDevelopment = config.NODE_ENV === "development";
 // Common cookie options
 const cookieOptions = {
-  httpOnly: true, // Prevents JavaScript access
-  sameSite: isDevelopment ? "lax" : "strict", // CSRF protection
-  secure: !isDevelopment, // false in development, true in production  // Only sent over HTTPS
+  // httpOnly: true, // Prevents JavaScript access
+  sameSite: "None", //isDevelopment ? "lax" : "strict", // CSRF protection
+  secure: true, // false in development, true in production  // Only sent over HTTPS
   signed: true,
 };
 export const AuthCookie = {
@@ -18,9 +18,8 @@ export const AuthCookie = {
       ...(cookieOptions as CookieOptions),
       maxAge: 900000, // 15 minutes
       path: "/",
-      // signed: true,
     });
-
+    // console.log(r);
     // Refresh token in HTTP-only cookie
     // Longer lived (days/weeks)
     res.cookie("refresh_token", refreshToken, {

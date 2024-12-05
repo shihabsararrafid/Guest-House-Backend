@@ -222,7 +222,23 @@ export default class BookingRepository extends BaseRepository<Booking> {
       });
       const checkOutTime = add(new Date(checkOut), {
         hours: 11,
-      });
+      }); // Check if check-in time is before current time
+      const currentTime = new Date();
+      if (checkInTime < currentTime) {
+        throw new AppError(
+          "validation-error",
+          "Check-in time cannot be in the past",
+          400
+        );
+      }
+      // Check if checkout time is before check-in time
+      if (checkOutTime <= checkInTime) {
+        throw new AppError(
+          "validation-error",
+          "Check-out time must be after check-in time",
+          400
+        );
+      }
       const capacityArray = (JSON.parse(capacity) as number[]).sort(
         (a, b) => a - b
       );
