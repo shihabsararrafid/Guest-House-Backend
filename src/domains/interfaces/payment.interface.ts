@@ -36,3 +36,6 @@ export const paymentTransactionSchema = z.object({
     .enum(["visa", "mastercard", "amex", "discover", "other"])
     .optional(),
 });
+export const confirmPaymentTransactionSchema = z.object({
+  status: PaymentStatus.default("COMPLETED"),
+});

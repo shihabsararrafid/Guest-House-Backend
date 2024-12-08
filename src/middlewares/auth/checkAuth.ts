@@ -42,6 +42,8 @@ export const checkAuth = (types?: string[], required = true) => {
         try {
           const t = await jwtService.refreshAccessToken(refresh_token);
           AuthCookie.setAuthCookies(res, t.accessToken, t.refreshToken);
+          res.cookie("access_token", t.accessToken, { path: "/" });
+          res.cookie("refresh_token", t.refreshToken, { path: "/" });
           const decoded = (await jwtService.verifyToken(
             t.accessToken
           )) as AuthPayload;

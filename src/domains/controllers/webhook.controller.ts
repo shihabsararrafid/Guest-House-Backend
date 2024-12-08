@@ -15,13 +15,16 @@ export class WebhookController extends BaseController {
 
   async handleStripeWebhook(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("herre");
       // 1. Verify webhook signature
       const sig = req.headers["stripe-signature"];
+      console.log(sig, "ds", req.body);
       if (!sig) throw new AppError("Webhook Error", "", 500);
       const event = this.stripe.webhooks.constructEvent(
         req.body,
         sig,
-        config.STRIPE_WEBHOOK_SECRET
+        "whsec_616e43f2c4d8e13078a86a48e36d20f8ac7035e7b1232a7294bfd30ce59184fe"
+        // config.STRIPE_WEBHOOK_SECRET
       );
 
       // 2. Handle different event types
@@ -29,17 +32,19 @@ export class WebhookController extends BaseController {
 
       return { received: true };
     } catch (err) {
+      console.error(err);
       throw new AppError("WebHook Error", "", 500);
     }
   }
 
   private async handleWebhookEvent(event: Stripe.Event) {
+    console.log(event.type);
     // 3. Use prisma transaction to update both payment and booking
     await this.prisma.$transaction(async (prisma) => {
       switch (event.type) {
         case "payment_intent.succeeded":
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
-
+          console.log("succceeded");
           // Update payment transaction
           const payment = await prisma.paymentTransaction.update({
             where: {

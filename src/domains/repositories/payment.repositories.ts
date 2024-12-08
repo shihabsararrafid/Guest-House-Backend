@@ -1,7 +1,10 @@
 import { PaymentTransaction } from "@prisma/client";
 import { BaseRepository } from "./BaseRepositories";
 import { z } from "zod";
-import { paymentTransactionSchema } from "../interfaces/payment.interface";
+import {
+  confirmPaymentTransactionSchema,
+  paymentTransactionSchema,
+} from "../interfaces/payment.interface";
 import { AppError } from "../../libraries/error-handling/AppError";
 import config from "../../configs";
 import { AuthPayload } from "../interfaces/auth.interface";
@@ -61,6 +64,66 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
         return {
           ...paymentTransaction,
           client_secret: paymentResponse.clientSecret,
+        };
+      });
+
+      return result;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get the room info: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
+  }
+  async confirmPayment(
+    paymentId: string,
+    data: z.infer<typeof confirmPaymentTransactionSchema>,
+    user: AuthPayload
+  ): Promise<any> {
+    try {
+      // Wrap everything in a transaction
+      const result = await this.prisma.$transaction(async (tx) => {
+        // 1. Check booking
+        const transaction = await tx.paymentTransaction.findUnique({
+          where: {
+            id: paymentId,
+            userId: user.id,
+          },
+        });
+
+        if (!transaction) {
+          throw new AppError("db-error", "Payment transaction Not Found", 404);
+        }
+
+        const paymentTransaction = await tx.paymentTransaction.update({
+          where: {
+            id: paymentId,
+            userId: user.id,
+          },
+          data: data,
+          include: {
+            booking: {
+              include: {
+                rooms: {
+                  include: {
+                    room: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        // Return payment response (contains clientSecret for frontend)
+        return {
+          ...paymentTransaction,
         };
       });
 
