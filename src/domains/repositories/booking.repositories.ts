@@ -2,6 +2,7 @@ import {
   bookRoomsSchema,
   getAvailableBookingSchema,
   getBookingsSchemaAdmin,
+  getBookingsSchemaUser,
 } from "./../interfaces/booking.interface";
 import { Bed, Booking, PrismaClient, Room } from "@prisma/client";
 import { AppError } from "../../libraries/error-handling/AppError";
@@ -299,6 +300,69 @@ export default class BookingRepository extends BaseRepository<Booking> {
       if (data.guestId) {
         query = { ...query, guestId: data.guestId };
       }
+      if (data.bookingStatus) {
+        query = { ...query, status: data.bookingStatus };
+      }
+      if (data.roomId) {
+        query = {
+          ...query,
+          rooms: {
+            roomId: data.roomId,
+          },
+        };
+      }
+
+      const bookings = await this.prisma.booking.findMany({
+        where: query,
+        include: {
+          rooms: {
+            include: {
+              room: {
+                select: { roomNumber: true },
+              },
+            },
+          },
+          transaction: true,
+        },
+      });
+      return bookings;
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      } else {
+        throw new AppError(
+          "database-error",
+          `Failed to get list of rooms: ${
+            error instanceof Error ? error.message : "Unexpected error"
+          }`,
+          500
+        );
+      }
+    }
+  }
+  async getUserBookedRooms(
+    data: z.infer<typeof getBookingsSchemaUser>,
+    userPayload: AuthPayload
+  ): Promise<Partial<Booking>[]> {
+    try {
+      let query: { [key: string]: any } = { guestId: userPayload.id };
+
+      if (data.checkIn) {
+        const checkInTime = add(new Date(data.checkIn), {
+          hours: 12,
+        });
+        query = { ...query, checkIn: { gte: checkInTime } };
+      }
+      if (data.checkOut) {
+        const checkOutTime = add(new Date(data.checkOut), {
+          hours: 11,
+        });
+        query = { ...query, checkOut: { lte: checkOutTime } };
+      }
+      if (data.isPaid === true || data.isPaid === false) {
+        query = { ...query, isPaid: data.isPaid };
+      }
+
       if (data.bookingStatus) {
         query = { ...query, status: data.bookingStatus };
       }

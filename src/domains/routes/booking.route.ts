@@ -14,6 +14,7 @@ import {
   bookRoomsSchema,
   getAvailableBookingSchema,
   getBookingsSchemaAdmin,
+  getBookingsSchemaUser,
 } from "../interfaces/booking.interface";
 import { checkAuth } from "../../middlewares/auth/checkAuth";
 
@@ -31,6 +32,12 @@ router.post(
 router.get(
   "/get-admin-bookings",
   validateRequest({ schema: getBookingsSchemaAdmin, isQuery: true }),
+  (req, res, next) => bookingController.getBookedRoomsAdmin(req, res, next)
+);
+router.get(
+  "/get-bookings",
+  checkAuth(),
+  validateRequest({ schema: getBookingsSchemaUser, isQuery: true }),
   (req, res, next) => bookingController.getBookedRoomsAdmin(req, res, next)
 );
 router.get(

@@ -50,3 +50,10 @@ export const getBookingsSchemaAdmin = z.object({
   guestId: z.string().optional(),
   roomId: z.string().optional(),
 });
+export const getBookingsSchemaUser = z.object({
+  checkIn: z.coerce.date().optional(),
+  checkOut: z.coerce.date().optional(),
+  isPaid: z.coerce.boolean().optional(),
+  bookingStatus: BookingStatusEnum,
+  roomId: z.string().optional(),
+});

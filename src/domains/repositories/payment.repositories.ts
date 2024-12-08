@@ -120,6 +120,14 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
             },
           },
         });
+        const b = await tx.booking.update({
+          where: {
+            id: paymentTransaction.bookingId,
+          },
+          data: {
+            status: "CONFIRMED",
+          },
+        });
 
         // Return payment response (contains clientSecret for frontend)
         return {

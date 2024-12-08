@@ -127,6 +127,27 @@ export default class BookingController extends BaseController {
       }
     }
   }
+  async getBookedRoomsUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userPayload = req.user;
+      // console.log(req.body);
+      const room = await this.bookingRepository.getUserBookedRooms(
+        req.query as unknown as getAdminBookingsSchema,
+        userPayload
+      );
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
+      }
+    }
+  }
   //   async getAllRooms(
   //     req: Request,
   //     res: Response,
@@ -177,21 +198,21 @@ export default class BookingController extends BaseController {
       }
     }
   }
-    async updateBookings(
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ): Promise<void> {
-      try {
-        const { id } = req.params;
-        const room = await this.bookingRepository.update(id, req.body);
-        this.sendSuccessResponse(res, room);
-      } catch (error) {
-        if (error instanceof AppError) {
-          this.sendErrorResponse(res, error);
-        } else {
-          next(error);
-        }
+  async updateBookings(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const room = await this.bookingRepository.update(id, req.body);
+      this.sendSuccessResponse(res, room);
+    } catch (error) {
+      if (error instanceof AppError) {
+        this.sendErrorResponse(res, error);
+      } else {
+        next(error);
       }
     }
+  }
 }
