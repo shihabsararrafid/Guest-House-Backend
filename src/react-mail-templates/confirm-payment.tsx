@@ -20,6 +20,7 @@ interface ConfirmBookingEmailProps {
     checkIn: string;
     checkOut: string;
     totalPrice: number;
+    paidAmount: number;
     rooms: Array<{
       roomNumber: string;
       type: string;
@@ -147,7 +148,7 @@ export const ConfirmBookingEmail = ({
             </Column>
             <Column style={productPriceVerticalLine}></Column>
             <Column style={productPriceLargeWrapper}>
-              <Text style={productPriceLarge}>BDT {booking?.totalPrice}</Text>
+              <Text style={productPriceLarge}>BDT {booking?.paidAmount}</Text>
             </Column>
           </Row>
         </Section>

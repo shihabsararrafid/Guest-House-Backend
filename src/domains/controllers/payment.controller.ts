@@ -66,6 +66,7 @@ export default class PaymentController extends BaseController {
           checkIn: room?.booking?.checkIn,
           checkOut: room?.booking?.checkOut,
           totalPrice: room?.booking?.totalPrice,
+          paidAmount: room?.booking?.paidAmount,
           rooms: d,
         },
         payment: {

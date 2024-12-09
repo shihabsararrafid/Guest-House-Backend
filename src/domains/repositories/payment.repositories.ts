@@ -39,7 +39,10 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
 
         // 2. Create Stripe payment
         const paymentResponse = await createPayment({
-          amount: data.amount * 100,
+          amount:
+            (typeof data.amount === "string"
+              ? parseInt(data.amount)
+              : data.amount) * 100,
           email: user.email,
           metadata: { bookingId: booking.id }, // Only send necessary booking data
         });
@@ -102,6 +105,25 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
           throw new AppError("db-error", "Payment transaction Not Found", 404);
         }
 
+        const booking = await tx.booking.findUnique({
+          where: {
+            id: transaction.bookingId,
+          },
+        });
+        if (booking) {
+          const paidAmount = transaction.amount + booking?.paidAmount;
+          const b = await tx.booking.update({
+            where: {
+              id: transaction.bookingId,
+            },
+            data: {
+              status: "CONFIRMED",
+              paidAmount,
+              isPaid:
+                paidAmount === booking.totalPriceWithDiscount ? true : false,
+            },
+          });
+        }
         const paymentTransaction = await tx.paymentTransaction.update({
           where: {
             id: paymentId,
@@ -118,14 +140,6 @@ export default class PaymentRepository extends BaseRepository<PaymentTransaction
                 },
               },
             },
-          },
-        });
-        const b = await tx.booking.update({
-          where: {
-            id: paymentTransaction.bookingId,
-          },
-          data: {
-            status: "CONFIRMED",
           },
         });
 
