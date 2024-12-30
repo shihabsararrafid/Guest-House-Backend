@@ -104,7 +104,7 @@ export default class BookingRepository extends BaseRepository<Booking> {
         }),
         checkInTime
       );
-      console.log(totalStay);
+      // console.log(totalStay);
       const result = await prisma.$transaction(async (tx) => {
         for (const r of rooms) {
           // check whether room is booked or not , or whether room exists or not
@@ -133,9 +133,16 @@ export default class BookingRepository extends BaseRepository<Booking> {
               404
             );
           }
-          total += r.pricePerNight * totalStay;
+          const g = parseInt(r.numberOfGuests.toString());
+          const p = parseInt(r.pricePerNight.toString());
+          total += p * totalStay;
           const { id, ...d } = r;
-          roomInfo.push({ ...d, roomId: id });
+          roomInfo.push({
+            ...d,
+            pricePerNight: p,
+            numberOfGuests: g,
+            roomId: id,
+          });
         }
         const discount = others.discount ?? 0;
         const discountType = others.discountType ?? "Amount";

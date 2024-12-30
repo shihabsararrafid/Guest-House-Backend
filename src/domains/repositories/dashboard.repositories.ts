@@ -38,17 +38,18 @@ export class DashboardRepository {
       const roomsTrend = await this.calculateTrend(currentRooms, previousRooms);
 
       // Active guests trend (compare current week with previous week)
-      const currentActiveGuests = await this.prisma.booking.count({
+      const currentActiveGuests = await this.prisma.booking.findMany({
         where: {
           status: "CONFIRMED",
           checkIn: {
             gte: weekAgo,
           },
         },
-        // distinct: ["guestId"],
+
+        distinct: ["guestId"],
       });
 
-      const previousActiveGuests = await prisma.booking.count({
+      const previousActiveGuests = await prisma.booking.findMany({
         where: {
           status: "CONFIRMED",
           checkIn: {
@@ -56,14 +57,14 @@ export class DashboardRepository {
             lt: weekAgo,
           },
         },
-        // distinct: ["guestId"],
+        distinct: ["guestId"],
       });
 
       const guestsTrend = await this.calculateTrend(
-        currentActiveGuests,
-        previousActiveGuests
+        currentActiveGuests.length,
+        previousActiveGuests.length
       );
-
+      // console.log(currentActiveGuests, previousActiveGuests, guestsTrend);
       // New bookings trend (current week vs previous week)
       const currentBookings = await prisma.booking.count({
         where: {
@@ -152,7 +153,7 @@ export class DashboardRepository {
             icon: "Hotel",
           },
           activeGuests: {
-            value: currentActiveGuests,
+            value: currentActiveGuests.length,
             trend: guestsTrend,
             color: "text-green-600",
             bgColor: "bg-green-100",

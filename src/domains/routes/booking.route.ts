@@ -1,14 +1,8 @@
 // auth.route.ts
 import express from "express";
 import prisma from "../../libraries/db/prisma";
+import { checkAuth } from "../../middlewares/auth/checkAuth";
 import { validateRequest } from "../../middlewares/request-validate";
-import RoomController from "../controllers/room.controller";
-import {
-  createRoomSchema,
-  updateRoomSchema,
-} from "../interfaces/room.interface";
-import RoomRepository from "../repositories/room.repositories";
-import BookingRepository from "../repositories/booking.repositories";
 import BookingController from "../controllers/booking.controller";
 import {
   bookRoomsSchema,
@@ -16,7 +10,7 @@ import {
   getBookingsSchemaAdmin,
   getBookingsSchemaUser,
 } from "../interfaces/booking.interface";
-import { checkAuth } from "../../middlewares/auth/checkAuth";
+import BookingRepository from "../repositories/booking.repositories";
 
 const router = express.Router();
 const bookingRepository = new BookingRepository(prisma);

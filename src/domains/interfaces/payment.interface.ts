@@ -14,7 +14,7 @@ const PaymentType = z.enum(["PAYMENT", "REFUND", "CHARGEBACK"]);
 // Base payment transaction schema
 export const paymentTransactionSchema = z.object({
   id: z.string().uuid().optional(), // optional because it's generated
-  amount: z.number().int().positive(), // amount in cents
+  amount: z.number().positive(), // amount in cents
   currency: z.string().default("USD"),
   status: PaymentStatus.default("PENDING"),
   type: PaymentType.default("PAYMENT"),

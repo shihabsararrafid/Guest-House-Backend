@@ -18,12 +18,12 @@ export const checkAuth = (types?: string[], required = true) => {
         req.signedCookies.access_token ??
         req.cookies.access_token ??
         req.header("authentication")?.split(" ")[1];
-      console.log(token, "token");
+      // console.log(token, "token");
       if (!token) throw new AppError("Auth-error", "You Are Unauthorized", 401);
 
       const payload = (await jwtService.verifyToken(token)) as AuthPayload;
       req.user = payload;
-
+      // console.log("hjer");
       // Check role access if types are specified
       if (types?.length) {
         const hasAccess = types.includes(payload.role);

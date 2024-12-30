@@ -1,8 +1,7 @@
-import jwt, { SignOptions, VerifyOptions, JwtPayload } from "jsonwebtoken";
-import { InvalidTokenError, TokenExpiredError } from "./auth.error";
+import jwt, { JwtPayload, SignOptions, VerifyOptions } from "jsonwebtoken";
 import { createPrivateKey, KeyObject } from "node:crypto";
-import { CookieOptions, Response } from "express";
 import config from "../../../configs";
+import { InvalidTokenError, TokenExpiredError } from "./auth.error";
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
@@ -31,7 +30,7 @@ export class JwtService {
   async generateTokenPair(userData: object): Promise<TokenPair> {
     const accessToken = await this.generateToken(
       { ...userData, type: "access" },
-      { expiresIn: "20s" }
+      { expiresIn: "3h" }
     );
     const refreshToken = await this.generateToken(
       { ...userData, type: "refresh" },

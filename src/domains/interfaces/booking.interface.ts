@@ -29,8 +29,8 @@ export const bookRoomsSchema = z.object({
   rooms: z.array(
     z.object({
       id: z.string(),
-      numberOfGuests: z.number(),
-      pricePerNight: z.number(),
+      numberOfGuests: z.coerce.number(),
+      pricePerNight: z.coerce.number(),
     })
   ),
 });
