@@ -18,8 +18,7 @@ const userController = new UserController(userRepository);
 // SUPERADMIN routes
 router.get(
   "/admin/users",
-
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   validateRequest({ schema: getUsersQuerySchema, isQuery: true }),
   (req, res, next) => userController.getUsers(req, res, next)
 );
@@ -28,20 +27,18 @@ router.get(
 router.post(
   "/",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   validateRequest({ schema: createUserSchema }),
   (req, res, next) => userController.createUser(req, res, next)
 );
 
-router.get(
-  "/profile",
-
-  (req, res, next) => userController.getSingleUser(req, res, next)
+router.get("/profile", checkAuth(), (req, res, next) =>
+  userController.getSingleUser(req, res, next)
 );
 
 router.patch(
   "/profile",
-
+  checkAuth(),
   validateRequest({ schema: updateUserSchema }),
   (req, res, next) => userController.updateUser(req, res, next)
 );
@@ -57,14 +54,13 @@ router.patch(
 router.get(
   "/:id",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   (req, res, next) => userController.getSingleUser(req, res, next)
 );
 
 router.patch(
   "/:id",
-
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   validateRequest({ schema: updateUserSchema }),
   (req, res, next) => userController.updateUser(req, res, next)
 );
@@ -72,28 +68,28 @@ router.patch(
 router.delete(
   "/:id",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   (req, res, next) => userController.deleteUser(req, res, next)
 );
 
 router.post(
   "/:id/verify-email",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   (req, res, next) => userController.verifyEmail(req, res, next)
 );
 
 router.post(
   "/:id/deactivate",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   (req, res, next) => userController.deactivateUser(req, res, next)
 );
 
 router.post(
   "/:id/reactivate",
 
-  checkAuth(["SUPERADMIN"]),
+  checkAuth(["SUPERADMIN", "ADMIN"]),
   (req, res, next) => userController.reactivateUser(req, res, next)
 );
 

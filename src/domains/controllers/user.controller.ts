@@ -75,7 +75,7 @@ export default class UserController extends BaseController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.user;
       const user = await this.userRepository.getById(id);
       this.sendSuccessResponse(res, user);
     } catch (error) {
@@ -93,7 +93,7 @@ export default class UserController extends BaseController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { id } = req.params;
+      const { id } = req.user;
       const user = await this.userRepository.update(
         id,
         req.body as UpdateUserType

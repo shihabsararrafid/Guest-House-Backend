@@ -14,6 +14,7 @@ export const updateUserSchema = z.object({
   lastName: z.string().optional(),
   currentPosition: z.string().optional(),
   isActive: z.coerce.boolean().optional(),
+  role: z.string().optional(),
   // ... other updateable fields
 });
 
