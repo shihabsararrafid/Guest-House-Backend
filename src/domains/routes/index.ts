@@ -6,6 +6,7 @@ import paymentRoutes from "./payment.route";
 import dashboardRoutes from "./dashboard.route";
 import contactRoute from "./contact.route";
 import userRoute from "./user.route";
+import issueRoutes from "./issues.route";
 const defineRoutes = async (expressRouter: Router) => {
   expressRouter.use("/auth", authRoutes);
   expressRouter.use("/room", roomRoutes);
@@ -14,6 +15,7 @@ const defineRoutes = async (expressRouter: Router) => {
   expressRouter.use("/dashboard", dashboardRoutes);
   expressRouter.use("/contact", contactRoute);
   expressRouter.use("/user", userRoute);
+  expressRouter.use("/issue", issueRoutes);
 };
 
 export default defineRoutes;
