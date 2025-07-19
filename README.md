@@ -1,54 +1,180 @@
-## **Node.js Express Boilerplate: Best Practices for Project Structure**
+# **Guest House Management System - Backend**
 
-**Purpose**
+## Overview
 
-This boilerplate repository offers a well-structured and scalable foundation for Node.js Express projects, emphasizing industry best practices in folder architecture and file organization.  While it does not provide a functional implementation, it serves as a valuable starting point for building robust and maintainable applications.
+This backend system provides a comprehensive API for managing guest house operations, including room bookings, user management, payment processing, and administrative functions. Built with Node.js, Express, and Prisma, it follows best practices for a scalable and maintainable codebase.
 
-**Key Principles**
+## Features
 
-* **Modularity:** Clear separation of concerns into logical folders for enhanced maintainability.
-* **Scalability:** A structure designed to accommodate project growth and evolving complexity.
-* **Best Practices:** Adherence to established Node.js and Express conventions for a familiar development experience. 
-* **Documentation:** Emphasis on thorough explanations within each folder to promote understanding.
+### User Management
 
-**Project Structure Overview**
+- User registration and authentication
+- Role-based access control (guests, administrators)
+- JWT-based authentication
+- Profile management
 
-* **root directory**
-    * **docker/**  - Docker configuration for containerizing the application. [docker.md](/docker/docker.md) - Detailed instructions and documentation for using Docker with this project. 
-    * **docs/** - Project knowledge base and development documentation. [docs.md](/docs/docs.md) - Detailed instructions and documentation for using this project.
-    * **scripts/** -  Custom scripts for development, deployment, and utilities. [scripts.md](/scripts/scripts.md) - Detailed instructions and documentation for using scripts.
-    * **src/** - The core source code of the application. [src.md](/src/src.md) - Detailed instructions and documentation for using the source code.
-    * **test/** -  Unit, integration, and end-to-end tests. [test.md](/test/test.md) - Detailed instructions and documentation for running tests.
-    * **.editorconfig:**  Specifies basic code editor settings (indentation style, line endings, etc.). This ensures code looks the same regardless of the editor used by individual developers.
-    * **.eslintignore:**  Indicates files and directories that should be excluded from ESLint's code quality checks. 
-    * **.eslintrc:**  The core configuration file for ESLint.  It defines the JavaScript linting rules and stylistic preferences enforced in the project.
-    * **.gitattributes:** Allows customization of how Git handles certain files within your repository (e.g., specifying line endings, merge strategies).
-    * **.gitignore:**  Lists files and patterns to prevent accidental committing of development artifacts, sensitive data, or large generated files to version control.
-    * **.npmignore:**  Similar to `.gitignore` but specifically for npm packaging. It controls what's excluded when publishing your project as an npm module.
-    * **.npmrc:**  Contains configuration options for the npm package manager. This can be used for setting registry URLs, proxy settings, and other npm behaviors.
-    * **.nvmrc:** Specifies a Node.js version for the project. Using Node Version Manager (nvm) helps ensure all developers use the same version, preventing compatibility issues.
-    * **.prettierrc:** Configures the Prettier code formatter with preferred formatting rules (semicolons, spacing, quotes, etc.).  This promotes code style homogeneity within the project.
-    * **.snyk:** Likely used for Snyk dependency vulnerability scanning. This file holds configuration options related to integrating Snyk into your development workflow.
-    * **CODE_OF_CONDUCT.md:** Guidelines for community interaction and collaboration.
-    * **CONTRIBUTING.md:** Instructions for contributing to the project.
-    * **LICENSE:**  The license governing the use and distribution of the project.
-    * **README.md:**  Overview of the project, its structure, and key files.
-    * **package.json:**  Metadata and dependencies for the Node.js project.
-    * **package-lock.json:** Lock file automatically generated for any operations where npm modifies either the `node_modules` tree or `package.json`.
+### Room Management
 
+- Room inventory with detailed information (capacity, pricing, availability)
+- Room status tracking (available, maintenance, etc.)
+- Room category and type organization
 
-**Getting Started**
+### Booking System
 
-1. Clone this repository.
-2. Install dependencies (`npm install`)
-3. Review and customize configuration files as needed.
-4. Refer to the documentation within each folder for guidance on how to build out your application.
+- Real-time availability checking
+- Room reservation and booking management
+- Support for different guest capacities
+- Check-in/check-out date validation
+- Booking confirmation and modification
+- Booking history for users and administrators
 
+### Payment Processing
 
-**Run tests**
+- Secure payment handling via Stripe integration
+- Multiple payment methods support
+- Discount management
+- Payment status tracking
+- Payment receipts and invoices
+- Transaction history
 
-1. Run `npm test` to execute all tests.
+### Admin Dashboard
 
-**Community Contributions**
+- Comprehensive analytics and reporting
+- Booking overview and management
+- User management tools
+- Payment tracking and reconciliation
 
-This boilerplate aims to be a collaborative resource.  Feel free to suggest improvements, refinements, or alternative approaches via pull requests or discussions.
+### Notifications
+
+- Email notifications for bookings and payments
+- Confirmation emails
+- Reminder notifications
+
+### Issue Management
+
+- Guest issue reporting system
+- Issue tracking and resolution workflow
+
+## Technology Stack
+
+- **Framework**: Node.js with Express
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT (JSON Web Tokens)
+- **Payment Processing**: Stripe
+- **Email**: Nodemailer with React Email templates
+- **Validation**: Zod schema validation
+- **Logging**: Winston
+- **Testing**: Jest
+
+## Project Structure
+
+- **root directory**
+  - **docker/** - Docker configuration for containerized deployment
+  - **docs/** - Project documentation and API references
+  - **logs/** - Application logs (auto-generated)
+  - **prisma/** - Database schema and migrations
+  - **scripts/** - Utility scripts for development and deployment
+  - **src/** - Core application source code
+    - **domains/** - Feature modules (users, bookings, rooms, etc.)
+    - **libraries/** - Shared utilities and helpers
+  - **test/** - Unit and integration tests
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- PostgreSQL database
+- Stripe account for payment processing
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/shihabsararrafid/Guest-House-Backend.git
+   cd Guest-House-Backend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+
+   - Create a `.env.development` file in the src directory based on `.env.example`
+   - Configure database connection, JWT secrets, and Stripe API keys
+
+4. Generate JWT keypair:
+
+   ```bash
+   npm run genKey
+   ```
+
+5. Set up the database:
+   ```bash
+   npm run generate     # Generate Prisma client
+   npm run migrate-dev  # Run database migrations
+   ```
+
+### Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The server will be running at `http://localhost:3000` (or the port specified in your environment).
+
+### Building for Production
+
+Build the project:
+
+```bash
+npm run build
+```
+
+Start the production server:
+
+```bash
+npm start
+```
+
+## API Documentation
+
+API documentation can be found in the `/docs/api-documentation.md` file or by visiting the `/api-docs` endpoint when the server is running.
+
+The documentation includes detailed information about:
+
+- Authentication endpoints
+- User management
+- Room operations
+- Booking processes
+- Payment handling
+- Issue management
+- Admin dashboard
+
+## Testing
+
+Run the test suite:
+
+```bash
+npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+## License
+
+This project is licensed under the ISC License - see the LICENSE file for details.
+
+## Author
+
+Shihab Sarar Islam Rafid
