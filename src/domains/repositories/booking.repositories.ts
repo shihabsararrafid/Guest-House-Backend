@@ -255,6 +255,7 @@ export default class BookingRepository extends BaseRepository<Booking> {
       const highCapacity = capacityArray[len - 1];
       const roomsAvailableForDates = await prisma.room.findMany({
         where: {
+          status: "AVAILABLE",
           bookings: {
             none: {
               booking: {
